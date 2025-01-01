@@ -16,7 +16,7 @@ final class ServicesCommand extends Command
 
         foreach ($services as $service_name => $service) {
             info("begain run '{$service_name}'")->out(false);
-            $this->cache->set($service_name . '-success', false, 2_1600);
+            $this->cache->set($service_name . '-success', false);
 
             foreach ($service as $index => $bpjs) {
                 $nik                  = $this->getNIK($bpjs);
@@ -32,8 +32,8 @@ final class ServicesCommand extends Command
             }
 
             // cache to prevent fail
-            $this->cache->set($service_name, $all[$service_name], 2_1600); // 6 jam
-            $this->cache->set($service_name . '-success', true, 2_1600);
+            $this->cache->set($service_name, $all[$service_name]);
+            $this->cache->set($service_name . '-success', true);
         }
 
         $json   = json_encode($all);
