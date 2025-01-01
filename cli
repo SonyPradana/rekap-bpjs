@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Commands\AnalizeCommand;
 use App\Commands\ServicesCommand;
 use App\Commands\VisitCommand;
+use App\Commands\VisitorDetailsCommand;
+use App\Commands\VisitorDetailsExportCommand;
 use App\PCare;
 use GuzzleHttp\Client;
 use System\Cache\Storage\FileStorage;
@@ -25,6 +27,8 @@ $app = match (true) {
     'servise:visit' === $option   => new VisitCommand($argv, __DIR__, $cache, $pcare),
     'service:detail' === $option  => new ServicesCommand($argv, __DIR__, $cache, $pcare),
     'service:analize' === $option => new AnalizeCommand($argv, __DIR__, $cache, $pcare),
+    'visit:detail' === $option    => new VisitorDetailsCommand($argv, __DIR__, $cache, $pcare),
+    'visit:export' === $option    => new VisitorDetailsExportCommand($argv, __DIR__, $cache, $pcare),
     default                       => exit(1),
 };
 
