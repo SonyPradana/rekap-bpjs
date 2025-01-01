@@ -22,10 +22,10 @@ array_shift($copy_argv);
 $option = array_shift($copy_argv);
 
 $app = match (true) {
-    'analize' === $option  => new AnalizeCommand($argv, __DIR__, $cache, $pcare),
-    'visit' === $option    => new VisitCommand($argv, __DIR__, $cache, $pcare),
-    'services' === $option => new ServicesCommand($argv, __DIR__, $cache, $pcare),
-    default                => exit(1),
+    'servise:visit' === $option   => new VisitCommand($argv, __DIR__, $cache, $pcare),
+    'service:detail' === $option  => new ServicesCommand($argv, __DIR__, $cache, $pcare),
+    'service:analize' === $option => new AnalizeCommand($argv, __DIR__, $cache, $pcare),
+    default                       => exit(1),
 };
 
 $exit = $app->__main();
