@@ -54,8 +54,8 @@ final class AnalizeCommand extends Command
             ->push('Rujukan: ')->push('(laki + perempuan)')->textDim()->newLines()
             ->push('PBI: ')->push($recap['rujukan-laki']['pbi'])->textGreen()->push(' + ')->textDim()->push($recap['rujukan-perempuan']['pbi'])->textGreen()
             ->push(' = ')->textDim()->push($recap['rujukan-laki']['pbi'] + $recap['rujukan-perempuan']['pbi'])->textYellow()->newLines()
-            ->push('Non: ')->push($recap['sehat-laki']['non'])->textGreen()->push(' + ')->textDim()->push($recap['sehat-perempuan']['non'])->textGreen()
-            ->push(' = ')->textDim()->push($recap['sehat-laki']['non'] + $recap['sehat-perempuan']['non'])->textYellow()->newLines(2)
+            ->push('Non: ')->push($recap['rujukan-laki']['non'])->textGreen()->push(' + ')->textDim()->push($recap['rujukan-perempuan']['non'])->textGreen()
+            ->push(' = ')->textDim()->push($recap['rujukan-laki']['non'] + $recap['rujukan-perempuan']['non'])->textYellow()->newLines(2)
             ->out()
         ;
         // rekap 2
