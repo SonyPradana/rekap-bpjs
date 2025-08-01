@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 use App\Commands\AnalizeCommand;
+use App\Commands\CacheForgetCommand;
+use App\Commands\CacheGetCommand;
+use App\Commands\CachePutCommand;
+use App\Commands\HelpCommand;
+use App\Commands\ServicesCacheWarmCommand;
 use App\Commands\ServicesCommand;
 use App\Commands\VisitCommand;
 use App\Commands\VisitorDetailsCommand;
@@ -19,18 +24,28 @@ $pcare = new PCare(new Client([
     'http_errors' => false,
 ]));
 
-$copy_argv = $argv;
+$copy_argv = $argv ?? ['cli', 'help'];
 array_shift($copy_argv);
 $option = array_shift($copy_argv);
 
-$app = match (true) {
-    'service:visit' === $option   => new VisitCommand($argv, __DIR__, $cache, $pcare),
-    'service:detail' === $option  => new ServicesCommand($argv, __DIR__, $cache, $pcare),
-    'service:analize' === $option => new AnalizeCommand($argv, __DIR__, $cache, $pcare),
-    'visit:detail' === $option    => new VisitorDetailsCommand($argv, __DIR__, $cache, $pcare),
-    'visit:export' === $option    => new VisitorDetailsExportCommand($argv, __DIR__, $cache, $pcare),
-    default                       => exit(1),
+$services = match ($option) {
+    // main command
+    'service:visit'   => VisitCommand::class,
+    'service:detail'  => ServicesCommand::class,
+    'service:analize' => AnalizeCommand::class,
+    // analize commnad
+    'visit:detail'    => VisitorDetailsCommand::class,
+    'visit:export'    => VisitorDetailsExportCommand::class,
+    // other
+    'cache:forget'       => CacheForgetCommand::class,
+    'cache:get'          => CacheGetCommand::class,
+    'cache:put'          => CachePutCommand::class,
+    'cache:service:warm' => ServicesCacheWarmCommand::class,
+    default              => HelpCommand::class,
 };
+
+/** @var App\Commands\Command */
+$app = new $services($argv, __DIR__, $cache, $pcare);
 
 $exit = $app->__main();
 
