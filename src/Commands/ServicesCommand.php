@@ -26,7 +26,7 @@ final class ServicesCommand extends Command
                     'jenis' => $jenis,
                 ];
 
-                info("{$index} bpjs: {$bpjs}, jenis: {$jenis}")->out(false);
+                info("{$index} {$service_name} bpjs: {$bpjs}, jenis: {$jenis}")->out(false);
 
                 usleep(1_200_000); // 1.2 detik
             }
@@ -36,7 +36,7 @@ final class ServicesCommand extends Command
             $this->cache->set($service_name . '-success', true);
         }
 
-        $json   = json_encode($all);
+        $json   = json_encode($all, JSON_PRETTY_PRINT);
         $return = file_put_contents($this->base_dir . '/logs/current.json', $json);
         ok('done')->out();
 
