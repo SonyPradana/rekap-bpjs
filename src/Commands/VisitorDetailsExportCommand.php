@@ -34,7 +34,7 @@ final class VisitorDetailsExportCommand extends Command
         $xmlContent = '';
         $xmlContent .= '<Row>';
 
-        $headers = ['Nama', 'BPJS', 'Tanggal Lahir', 'Alamat', 'HP', 'NIK'];
+        $headers = ['NIK', 'BPJS', 'Nama', 'Jenis Kelamin',  'Tanggal Lahir', 'Alamat'];
         foreach ($headers as $header) {
             $xmlContent .= '<Cell><Data ss:Type="String">' . htmlspecialchars($header) . '</Data></Cell>';
         }

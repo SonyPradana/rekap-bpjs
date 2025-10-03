@@ -13,10 +13,15 @@ final class VisitorDetailsCommand extends Command
 {
     public function __main(): int
     {
-        $cache  = $this->base_dir . '/logs/huge.php';
+        $source = $this->hasOption('bpjs');
+        $cache  = $this->base_dir . '/logs/huge.json';
         $visits = [];
         if (false === file_exists($cache)) {
-            $visits = $this->getVisitor(1, 11, 2024);
+            $start  = (int) $this->option('start', 1);
+            $end    = (int) $this->option('end', date('m'));
+            $year   = (int) $this->option('year', date('Y'));
+            $visits = $this->getVisitor($start, $end, $year);
+
             file_put_contents($cache, json_encode($visits));
         } else {
             $getCache = file_get_contents($cache);
@@ -29,13 +34,11 @@ final class VisitorDetailsCommand extends Command
         foreach ($visits as $visit) {
             $progress->current++;
             $progress->tick();
-            if (null === ($detail = $this->getVisitDetails($visit))) {
+            if (null === ($detail = $this->getVisitDetails($visit, $source))) {
                 continue;
             }
 
-            if (str_starts_with($detail['hp'], '08')) {
-                $details[$visit] = $detail;
-            }
+            $details[$visit] = $detail;
         }
 
         ok('Done, saving file...')->out();
@@ -61,22 +64,23 @@ final class VisitorDetailsCommand extends Command
         return $bpjs;
     }
 
-    private function getVisitDetails(string $bpjs): ?array
+    private function getVisitDetails(string $identias, bool $bpjs = true): ?array
     {
-        if (null == ($detail = $this->cache->get("visit.{$bpjs}", null))) {
+        if (null == ($detail = $this->cache->get("visit.{$identias}", null))) {
             while ($detail === null) {
-                $res  = $this->pcare->bpjs($bpjs);
+                /** @var \Psr\Http\Message\ResponseInterface */
+                $res  = $bpjs ? $this->pcare->bpjs($identias) : $this->pcare->nik($identias);
                 $body = $res->getBody()->getContents();
                 $json = json_decode($body, true);
 
                 if ('AKTIF' === ($json['statusAktif']['nama'] ?? '') && $_SERVER['KODE_FASKES'] === ($json['kdPpkPst']['kdPPK'] ?? '')) {
                     $detail = [
-                        'nama'   => $json['nama'],
+                        'nik'    => $json['nik'],
                         'bpjs'   => $json['noKartu'],
+                        'nama'   => $json['nama'],
+                        'jk'     => $json['sex'] === 'L' ? 'Laki-laki' : 'Perempuan',
                         'tgl'    => $json['tglLahir'],
                         'alamat' => str_replace('  ', ' ', trim($json['alamat'])),
-                        'hp'     => $json['noHP'],
-                        'nik'    => $json['nik'],
                     ];
                 } else {
                     break;
@@ -86,7 +90,7 @@ final class VisitorDetailsCommand extends Command
             }
 
             if (null !== $detail) {
-                $this->cache->set("visit.{$bpjs}", $detail);
+                $this->cache->set("visit.{$identias}", $detail);
             }
         }
 
