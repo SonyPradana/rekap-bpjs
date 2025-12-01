@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Commands;
 
 use function System\Console\info;
+use function System\Console\ok;
 
 final class VisitCommand extends Command
 {
     public function __main(): int
     {
+        $microtime   = microtime(true);
+
         $date    = $this->option('date', date('m') . '-' . date('Y'));
         $start   = (int) $this->option('start', 0);
         $end     = (int) $this->option('end', 5000);
@@ -28,6 +31,11 @@ final class VisitCommand extends Command
 
         $arrayable = var_export($all, true);
         $res       = file_put_contents($this->base_dir . '/logs/current.php', "<?php return {$arrayable};");
+        $count     = count($sakit['laki']) + count($sakit['perempuan'])
+                   + count($sehat['laki']) + count($sehat['perempuan'])
+                   + count($rujukan['laki']) + count($rujukan['perempuan']);
+
+        ok('Done in ' . round(microtime(true) - $microtime, 2) . ' seconds, total ' . $count . ' recorded.')->out();
 
         return false === $res ? 1 : 0;
     }
