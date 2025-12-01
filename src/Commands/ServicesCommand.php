@@ -37,7 +37,7 @@ final class ServicesCommand extends Command
                     continue;
                 }
 
-                $hit_bpjs = $this->cache->has($bpjs);
+                $hit_bpjs = $this->cache->has($nik);
                 $jenis    = $this->getJenisBPJS($nik);
                 if (null === $jenis) {
                     info("{$index} {$service_name} bpjs: {$bpjs}, jenis: UNKNOW")->out(false);
