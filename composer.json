@@ -2,9 +2,9 @@
     "name": "gevand/rekap-bpjs",
     "type": "project",
     "require": {
-        "sonypradana/console": "^0.36.6",
-        "sonypradana/cache": "^0.36.6",
-        "guzzlehttp/guzzle": "^7.9"
+        "sonypradana/console": "^0.40.3",
+        "sonypradana/cache": "^0.40.3",
+        "guzzlehttp/guzzle": "^7.10"
     },
     "autoload": {
         "psr-4": {
@@ -19,6 +19,6 @@
     ],
     "minimum-stability": "beta",
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.64"
+        "friendsofphp/php-cs-fixer": "^3.92.3"
     }
 }
