@@ -23,12 +23,14 @@ final class ServicesCommand extends Command
         foreach ($services as $service_name => $service) {
             info("begain run '{$service_name}'")->out(false);
             $this->cache->set($service_name . '-success', false);
+            $total = count($service);
 
             foreach ($service as $index => $bpjs) {
+                $percent = round((($index + 1) / $total) * 100, 2);
                 $hit_nik = $this->cache->has($bpjs);
                 $nik     = $this->getNIK($bpjs);
                 if (null === $nik) {
-                    warn("{$index} {$service_name} bpjs: {$bpjs}, nik: NOT FOUND")->out(false);
+                    warn("{$index} ({$percent}%) {$service_name} bpjs: {$bpjs}, nik: NOT FOUND")->out(false);
                     $skipped[$service_name][] = [
                         'bpjs'  => $bpjs,
                         'jenis' => 'NOT FOUND',
@@ -40,7 +42,7 @@ final class ServicesCommand extends Command
                 $hit_bpjs = $this->cache->has($nik);
                 $jenis    = $this->getJenisBPJS($nik);
                 if (null === $jenis) {
-                    warn("{$index} {$service_name} bpjs: {$bpjs}, jenis: UNKNOW")->out(false);
+                    warn("{$index} ({$percent}%) {$service_name} bpjs: {$bpjs}, jenis: UNKNOW")->out(false);
                     $skipped[$service_name][] = [
                         'bpjs'  => $bpjs,
                         'jenis' => 'UNKNOW',
@@ -54,7 +56,7 @@ final class ServicesCommand extends Command
                     'jenis' => $jenis,
                 ];
 
-                info("{$index} {$service_name} bpjs: {$bpjs}, jenis: {$jenis}")->out(false);
+                info("{$index} ({$percent}%) {$service_name} bpjs: {$bpjs}, jenis: {$jenis}")->out(false);
 
                 $interval = ($hit_nik ? 0 : $this->interval) + ($hit_bpjs ? 0 : $this->interval);
                 usleep($interval);
