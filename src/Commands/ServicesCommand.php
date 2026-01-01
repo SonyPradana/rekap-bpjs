@@ -28,7 +28,7 @@ final class ServicesCommand extends Command
                 $hit_nik = $this->cache->has($bpjs);
                 $nik     = $this->getNIK($bpjs);
                 if (null === $nik) {
-                    info("{$index} {$service_name} bpjs: {$bpjs}, nik: NOT FOUND")->out(false);
+                    warn("{$index} {$service_name} bpjs: {$bpjs}, nik: NOT FOUND")->out(false);
                     $skipped[$service_name][] = [
                         'bpjs'  => $bpjs,
                         'jenis' => 'NOT FOUND',
@@ -40,7 +40,7 @@ final class ServicesCommand extends Command
                 $hit_bpjs = $this->cache->has($nik);
                 $jenis    = $this->getJenisBPJS($nik);
                 if (null === $jenis) {
-                    info("{$index} {$service_name} bpjs: {$bpjs}, jenis: UNKNOW")->out(false);
+                    warn("{$index} {$service_name} bpjs: {$bpjs}, jenis: UNKNOW")->out(false);
                     $skipped[$service_name][] = [
                         'bpjs'  => $bpjs,
                         'jenis' => 'UNKNOW',
