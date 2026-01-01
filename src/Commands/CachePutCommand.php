@@ -12,7 +12,7 @@ final class CachePutCommand extends Command
     public function __main(): int
     {
         $key   = $this->option('key', null);
-        $value = $this->option('key', null);
+        $value = $this->option('value', null);
 
         if (null === $key) {
             fail('Put cachge requied key')->out();
