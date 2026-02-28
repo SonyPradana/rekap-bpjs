@@ -10,9 +10,13 @@ use Psr\Http\Message\UriInterface;
 
 final class PCare
 {
+    /** @var Client[] */
     private array $clients;
     private int $currentIndex = 0;
 
+    /**
+     * @param Client|Client[] $clients
+     */
     public function __construct(Client|array $clients)
     {
         $this->clients = is_array($clients) ? $clients : [$clients];
@@ -33,7 +37,7 @@ final class PCare
         };
     }
 
-    private function request(string $method, string $uri): ResponseInterface
+    private function request(string $method, string|UriInterface $uri): ResponseInterface
     {
         $total    = count($this->clients);
         $attempts = 0;
@@ -43,11 +47,17 @@ final class PCare
             $this->currentIndex = ($this->currentIndex + 1) % $total;
 
             try {
-                $response = $client->{$method}($uri);
+                $response = match ($method) {
+                    'get'   => $client->get($uri),
+                    'post'  => $client->post($uri),
+                    default => throw new \InvalidArgumentException("Unsupported method: {$method}"),
+                };
 
-                if (!$this->shouldFailover($response->getStatusCode())) {
+                if (false === $this->shouldFailover($response->getStatusCode())) {
                     return $response;
                 }
+            } catch (\InvalidArgumentException $e) {
+                throw $e;
             } catch (\Throwable) {
                 // connection error, timeout → failover
             }
@@ -65,16 +75,16 @@ final class PCare
 
     public function kunjungan(string $jenis, string $date, int $start = 0, int $end = 5_000): ResponseInterface
     {
-        return $this->request('get', "/kunjungan/{$date}/{$jenis}/{$start}/{$end}");
+        return $this->get("/kunjungan/{$date}/{$jenis}/{$start}/{$end}");
     }
 
     public function nik(string $nik): ResponseInterface
     {
-        return $this->request('get', "/info/{$nik}/nik");
+        return $this->get("/info/{$nik}/nik");
     }
 
     public function bpjs(string $bpjs): ResponseInterface
     {
-        return $this->request('get', "/info/{$bpjs}/bpjs");
+        return $this->get("/info/{$bpjs}/bpjs");
     }
 }
