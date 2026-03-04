@@ -52,6 +52,10 @@ final class PCare
 
     private function isCircuitOpen(int $index): bool
     {
+        if (1 === count($this->clients)) {
+            return false;
+        }
+
         if (false === isset($this->openUntil[$index])) {
             return false;
         }
@@ -67,6 +71,10 @@ final class PCare
 
     private function recordFailure(int $index): void
     {
+        if (1 === count($this->clients)) {
+            return;
+        }
+
         $this->failures[$index] = ($this->failures[$index] ?? 0) + 1;
 
         if ($this->failures[$index] >= $this->failureThreshold) {
@@ -76,6 +84,10 @@ final class PCare
 
     private function recordSuccess(int $index): void
     {
+        if (1 === count($this->clients)) {
+            return;
+        }
+
         unset($this->failures[$index], $this->openUntil[$index]);
     }
 

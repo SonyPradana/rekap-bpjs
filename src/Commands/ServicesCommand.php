@@ -84,47 +84,61 @@ final class ServicesCommand extends Command
 
     private function getNIK(string $bpjs): ?string
     {
-        if (null == ($nik = $this->cache->get($bpjs, null))) {
-            $retry = 0;
-            while ($nik === null) {
+        if (null !== ($nik = $this->cache->get($bpjs, null))) {
+            return $nik;
+        }
+
+        $retry = 0;
+        while ($retry < $this->max_retry) {
+            try {
                 $res  = $this->pcare->bpjs($bpjs);
                 $body = $res->getBody()->getContents();
                 $json = json_decode($body, true);
                 $nik  = $json['nik'] ?? null;
 
-                $this->ratelimter($nik, $this->delay($this->base_delay, $retry));
+                if (null !== $nik) {
+                    $this->cache->set($bpjs, $nik);
 
-                $retry++;
-                if ($retry >= $this->max_retry) {
-                    return null;
+                    return $nik;
                 }
+            } catch (\Throwable $t) {
+                warn($t->getMessage())->out(false);
             }
+
+            $this->ratelimter($nik, $this->delay($this->base_delay, $retry));
+            $retry++;
 
             $this->cache->set($bpjs, $nik);
         }
 
-        return $nik;
+        return null;
     }
 
     private function getJenisBPJS(string $nik): ?string
     {
-        if (null == ($jenis = $this->cache->get($nik, null))) {
-            $retry = 0;
-            while ($jenis === null) {
+        if (null !== ($jenis = $this->cache->get($nik, null))) {
+            return $jenis;
+        }
+
+        $retry = 0;
+        while ($retry < $this->max_retry) {
+            try {
                 $res   = $this->pcare->nik($nik);
                 $body  = $res->getBody()->getContents();
                 $json  = json_decode($body, true);
                 $jenis = $json['jnsPeserta']['nama'] ?? null;
 
-                $this->ratelimter($jenis, $this->delay($this->base_delay, $retry));
+                if (null !== $jenis) {
+                    $this->cache->set($nik, $jenis);
 
-                $retry++;
-                if ($retry >= $this->max_retry) {
-                    return null;
+                    return $jenis;
                 }
+            } catch (\Throwable $t) {
+                warn($t->getMessage())->out(false);
             }
 
-            $this->cache->set($nik, $jenis);
+            $this->ratelimter($jenis, $this->delay($this->base_delay, $retry));
+            $retry++;
         }
 
         return $jenis;
