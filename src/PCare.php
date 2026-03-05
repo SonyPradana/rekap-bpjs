@@ -19,20 +19,15 @@ final class PCare
     /** @var array<int, float> */
     private array $openUntil = [];
 
-    private int $failureThreshold;
-    private int $cooldownSeconds;
-
     /**
      * @param Client|Client[] $clients
      */
     public function __construct(
         Client|array $clients,
-        int $failureThreshold = 3,
-        int $cooldownSeconds  = 60,
+        private int $failureThreshold = 3,
+        private int $cooldownSeconds  = 60,
     ) {
-        $this->clients          = is_array($clients) ? $clients : [$clients];
-        $this->failureThreshold = $failureThreshold;
-        $this->cooldownSeconds  = $cooldownSeconds;
+        $this->clients = is_array($clients) ? $clients : [$clients];
 
         if (empty($this->clients)) {
             throw new \InvalidArgumentException('At least one client required.');
@@ -143,16 +138,26 @@ final class PCare
 
     public function kunjungan(string $jenis, string $date, int $start = 0, int $end = 5_000): ResponseInterface
     {
-        return $this->request('get', "/kunjungan/{$date}/{$jenis}/{$start}/{$end}");
+        return $this->get("/kunjungan/{$date}/{$jenis}/{$start}/{$end}");
     }
 
     public function nik(string $nik): ResponseInterface
     {
-        return $this->request('get', "/info/{$nik}/nik");
+        return $this->get("/info/{$nik}/nik");
     }
 
     public function bpjs(string $bpjs): ResponseInterface
     {
-        return $this->request('get', "/info/{$bpjs}/bpjs");
+        return $this->get("/info/{$bpjs}/bpjs");
+    }
+
+    public function check(): ResponseInterface
+    {
+        return $this->get('/check');
+    }
+
+    public function status(): bool
+    {
+        return 200 === $this->get('/check')->getStatusCode();
     }
 }

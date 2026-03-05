@@ -9,6 +9,7 @@ use System\Cache\Storage\FileStorage;
 use System\Console\Command as BaseCommand;
 
 use function System\Console\option;
+use function System\Console\style;
 use function System\Console\warn;
 
 abstract class Command extends BaseCommand
@@ -35,10 +36,19 @@ abstract class Command extends BaseCommand
 
     protected function checkLogin(): void
     {
-        $res   = $this->pcare->get('/check');
-        if ($res->getStatusCode() > 200) {
-            option('mohon login terlebih dahulu!', [
-                'yes' => static function () {},
+        if (false === $this->pcare->status()) {
+            $title = style('Mohon login terlebih dahulu! ')
+              ->textYellow()
+              ->push('(no untuk keluar)')
+              ->textDim();
+
+            option($title, [
+                'yes' => static function (): void {
+                    return;
+                },
+                'no' => static function (): never {
+                    exit(0);
+                },
             ]);
         }
     }
