@@ -95,6 +95,7 @@ final class PCare
     {
         $total    = count($this->clients);
         $attempts = 0;
+        $response = null;
 
         while ($attempts < $total) {
             $index              = $this->currentIndex;
@@ -126,6 +127,10 @@ final class PCare
             }
 
             $attempts++;
+        }
+
+        if ($response) {
+            return $response;
         }
 
         throw new \RuntimeException('All PCare accounts are unavailable.');
