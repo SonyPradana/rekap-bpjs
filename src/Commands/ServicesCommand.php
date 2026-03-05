@@ -90,25 +90,19 @@ final class ServicesCommand extends Command
 
         $retry = 0;
         while ($retry < $this->max_retry) {
-            try {
-                $res  = $this->pcare->bpjs($bpjs);
-                $body = $res->getBody()->getContents();
-                $json = json_decode($body, true);
-                $nik  = $json['nik'] ?? null;
+            $res  = $this->pcare->bpjs($bpjs);
+            $body = $res->getBody()->getContents();
+            $json = json_decode($body, true);
+            $nik  = $json['nik'] ?? null;
 
-                if (null !== $nik) {
-                    $this->cache->set($bpjs, $nik);
+            if (null !== $nik) {
+                $this->cache->set($bpjs, $nik);
 
-                    return $nik;
-                }
-            } catch (\Throwable $t) {
-                warn($t->getMessage())->out(false);
+                return $nik;
             }
 
-            $this->ratelimter($nik, $this->delay($this->base_delay, $retry));
+            $this->ratelimter(null, $this->delay($this->base_delay, $retry));
             $retry++;
-
-            $this->cache->set($bpjs, $nik);
         }
 
         return null;
@@ -122,22 +116,18 @@ final class ServicesCommand extends Command
 
         $retry = 0;
         while ($retry < $this->max_retry) {
-            try {
-                $res   = $this->pcare->nik($nik);
-                $body  = $res->getBody()->getContents();
-                $json  = json_decode($body, true);
-                $jenis = $json['jnsPeserta']['nama'] ?? null;
+            $res   = $this->pcare->nik($nik);
+            $body  = $res->getBody()->getContents();
+            $json  = json_decode($body, true);
+            $jenis = $json['jnsPeserta']['nama'] ?? null;
 
-                if (null !== $jenis) {
-                    $this->cache->set($nik, $jenis);
+            if (null !== $jenis) {
+                $this->cache->set($nik, $jenis);
 
-                    return $jenis;
-                }
-            } catch (\Throwable $t) {
-                warn($t->getMessage())->out(false);
+                return $jenis;
             }
 
-            $this->ratelimter($jenis, $this->delay($this->base_delay, $retry));
+            $this->ratelimter(null, $this->delay($this->base_delay, $retry));
             $retry++;
         }
 
