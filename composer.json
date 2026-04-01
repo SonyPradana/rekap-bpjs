@@ -4,7 +4,8 @@
     "require": {
         "sonypradana/console": "^0.40.3",
         "sonypradana/cache": "^0.40.3",
-        "guzzlehttp/guzzle": "^7.10"
+        "guzzlehttp/guzzle": "^7.10",
+        "vlucas/phpdotenv": "^5.6"
     },
     "autoload": {
         "psr-4": {
@@ -20,5 +21,8 @@
     "minimum-stability": "beta",
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.92.3"
+    },
+    "scripts": {
+        "fix": "php-cs-fixer fix --config=.php-cs-fixer.php --allow-risky=yes --verbose"
     }
 }

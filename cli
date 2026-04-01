@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 declare(strict_types=1);
@@ -13,16 +14,35 @@ use App\Commands\VisitCommand;
 use App\Commands\VisitorDetailsCommand;
 use App\Commands\VisitorDetailsExportCommand;
 use App\PCare;
+use Dotenv\Dotenv;
 use GuzzleHttp\Client;
+use System\Cache\CacheInterface;
 use System\Cache\Storage\FileStorage;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-$cache = new FileStorage(__DIR__ . '/cache', 7_884_008); // 3 month
-$pcare = new PCare(new Client([
-    'base_uri'    => 'http://127.0.0.1:3000',
-    'http_errors' => false,
-]));
+// load environment variables
+Dotenv::createImmutable(__DIR__)->load();
+
+// load configuration
+$config = new App\Configuration(require __DIR__ . '/config/app.php');
+
+// cache provider
+/** @var CacheInterface */
+$cache = match ($config->get('cache.driver', 'file')) {
+    'file' => new FileStorage(
+        path: __DIR__ . '/cache',
+        defaultTTL: $config->get('cache.ttl', 7_884_008)
+    ),
+    default => throw new InvalidArgumentException('Unsupported cache driver: ' . $config->get('cache.driver')),
+};
+
+// create PCare instance
+$pcare = new PCare(
+    clients: new Client($config->get('client.clients')),
+    failureThreshold: $config->get('client.threshold', 3),
+    cooldownSeconds: $config->get('client.cooldown', 60),
+);
 
 $copy_argv = $argv ?? ['cli', 'help'];
 array_shift($copy_argv);
@@ -46,6 +66,12 @@ $services = match ($option) {
 
 /** @var App\Commands\Command */
 $app = new $services($argv, __DIR__, $cache, $pcare);
+
+if ($app instanceof VisitorDetailsCommand) {
+    $app->setProvider(
+        provider: $config->get('bpjs.provider', '')
+    );
+}
 
 $exit = $app->__main();
 
