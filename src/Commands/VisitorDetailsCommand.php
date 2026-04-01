@@ -11,6 +11,8 @@ use function System\Console\ok;
 
 final class VisitorDetailsCommand extends Command
 {
+    private string $provider;
+
     public function __main(): int
     {
         $source = $this->hasOption('bpjs');
@@ -46,6 +48,11 @@ final class VisitorDetailsCommand extends Command
         return false === file_put_contents($this->base_dir . '/logs/huge_visitor.json', json_encode($details)) ? 0 : 1;
     }
 
+    public function setProvider(string $provider): void
+    {
+        $this->provider = $provider;
+    }
+
     private function getVisitor(int $month_start, int $month_end, int $year): array
     {
         $bpjs = [];
@@ -73,7 +80,7 @@ final class VisitorDetailsCommand extends Command
                 $body = $res->getBody()->getContents();
                 $json = json_decode($body, true);
 
-                if ('AKTIF' === ($json['statusAktif']['nama'] ?? '') && $_SERVER['KODE_FASKES'] === ($json['kdPpkPst']['kdPPK'] ?? '')) {
+                if ('AKTIF' === ($json['statusAktif']['nama'] ?? '') && $this->provider === ($json['kdPpkPst']['kdPPK'] ?? '')) {
                     $detail = [
                         'nik'    => $json['nik'],
                         'bpjs'   => $json['noKartu'],
