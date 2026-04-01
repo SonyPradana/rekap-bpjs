@@ -44,7 +44,6 @@ abstract class Command extends BaseCommand
 
             option($title, [
                 'yes' => static function (): void {
-                    return;
                 },
                 'no' => static function (): never {
                     exit(0);
