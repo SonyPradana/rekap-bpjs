@@ -37,7 +37,7 @@ final class ServicesCacheWarmCommand extends Command
         if (count($fails) > 0) {
             $failsnik = new Style('fail get nik');
             foreach ($fails as $nik) {
-                $failsnik->tabs()->push($nik)->textDim()->newline();
+                $failsnik->tabs()->push($nik)->textDim()->newLines();
             }
             $failsnik->out();
         }
