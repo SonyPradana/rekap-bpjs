@@ -11,16 +11,13 @@ return [
             ],
         ],
         'threshold' => (int) $_ENV['CLIENT_THRESHOLD'] ?? 3,
-        'cooldown'  => (int)  $_ENV['CLIENT_COOLDOWN'] ?? 60,
+        'cooldown'  => (int) $_ENV['CLIENT_COOLDOWN'] ?? 60,
     ],
     'bpjs' => [
         'provider' => $_ENV['BPJS_PROVIDER'] ?? '',
     ],
     'cache' => [
-        'ttl'    => (int) $_ENV['CACHE_TTL'] ?? 7_884_008,
         'driver' => $_ENV['CACHE_DRIVER'] ?? 'file',
-        'file'   => [
-            'path' => $_ENV['CACHE_FILE_PATH'] ?? __DIR__ . '/../cache',
-        ],
+        'ttl'    => (int) $_ENV['CACHE_TTL'] ?? 7_884_008,
     ],
 ];

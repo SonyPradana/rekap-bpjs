@@ -17,7 +17,7 @@ final class Configuration
             return $this->config[$key] ?? $default;
         }
 
-        $keys = explode('.', $key);
+        $keys  = explode('.', $key);
         $value = $this->config;
 
         foreach ($keys as $k) {

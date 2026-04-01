@@ -31,7 +31,7 @@ $config = new App\Configuration(require __DIR__ . '/config/app.php');
 /** @var CacheInterface */
 $cache = match ($config->get('cache.driver', 'file')) {
     'file' => new FileStorage(
-        path: $config->get('cache.file.path', __DIR__ . '/cache'),
+        path: __DIR__ . '/cache',
         defaultTTL: $config->get('cache.ttl', 7_884_008)
     ),
     default => throw new InvalidArgumentException('Unsupported cache driver: ' . $config->get('cache.driver')),
