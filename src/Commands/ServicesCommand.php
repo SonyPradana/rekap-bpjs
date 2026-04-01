@@ -84,50 +84,54 @@ final class ServicesCommand extends Command
 
     private function getNIK(string $bpjs): ?string
     {
-        if (null == ($nik = $this->cache->get($bpjs, null))) {
-            $retry = 0;
-            while ($nik === null) {
-                $res  = $this->pcare->bpjs($bpjs);
-                $body = $res->getBody()->getContents();
-                $json = json_decode($body, true);
-                $nik  = $json['nik'] ?? null;
-
-                $this->ratelimter($nik, $this->delay($this->base_delay, $retry));
-
-                $retry++;
-                if ($retry >= $this->max_retry) {
-                    return null;
-                }
-            }
-
-            $this->cache->set($bpjs, $nik);
+        if (null !== ($nik = $this->cache->get($bpjs, null))) {
+            return $nik;
         }
 
-        return $nik;
+        $retry = 0;
+        while ($retry < $this->max_retry) {
+            $res  = $this->pcare->bpjs($bpjs);
+            $body = $res->getBody()->getContents();
+            $json = json_decode($body, true);
+            $nik  = $json['nik'] ?? null;
+
+            if (null !== $nik) {
+                $this->cache->set($bpjs, $nik);
+
+                return $nik;
+            }
+
+            $this->ratelimter(null, $this->delay($this->base_delay, $retry));
+            $retry++;
+        }
+
+        return null;
     }
 
     private function getJenisBPJS(string $nik): ?string
     {
-        if (null == ($jenis = $this->cache->get($nik, null))) {
-            $retry = 0;
-            while ($jenis === null) {
-                $res   = $this->pcare->nik($nik);
-                $body  = $res->getBody()->getContents();
-                $json  = json_decode($body, true);
-                $jenis = $json['jnsPeserta']['nama'] ?? null;
-
-                $this->ratelimter($jenis, $this->delay($this->base_delay, $retry));
-
-                $retry++;
-                if ($retry >= $this->max_retry) {
-                    return null;
-                }
-            }
-
-            $this->cache->set($nik, $jenis);
+        if (null !== ($jenis = $this->cache->get($nik, null))) {
+            return $jenis;
         }
 
-        return $jenis;
+        $retry = 0;
+        while ($retry < $this->max_retry) {
+            $res   = $this->pcare->nik($nik);
+            $body  = $res->getBody()->getContents();
+            $json  = json_decode($body, true);
+            $jenis = $json['jnsPeserta']['nama'] ?? null;
+
+            if (null !== $jenis) {
+                $this->cache->set($nik, $jenis);
+
+                return $jenis;
+            }
+
+            $this->ratelimter(null, $this->delay($this->base_delay, $retry));
+            $retry++;
+        }
+
+        return null;
     }
 
     private function delay(int $base, int $retry): int
