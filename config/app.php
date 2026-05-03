@@ -10,14 +10,14 @@ return [
                 'http_errors' => false,
             ],
         ],
-        'threshold' => (int) $_ENV['CLIENT_THRESHOLD'] ?? 3,
-        'cooldown'  => (int) $_ENV['CLIENT_COOLDOWN'] ?? 60,
+        'threshold' => (int) ($_ENV['CLIENT_THRESHOLD'] ?? 3),
+        'cooldown'  => (int) ($_ENV['CLIENT_COOLDOWN'] ?? 60),
     ],
     'bpjs' => [
         'provider' => $_ENV['BPJS_PROVIDER'] ?? '',
     ],
     'cache' => [
         'driver' => $_ENV['CACHE_DRIVER'] ?? 'file',
-        'ttl'    => (int) $_ENV['CACHE_TTL'] ?? 7_884_008,
+        'ttl'    => (int) ($_ENV['CACHE_TTL'] ?? 7_884_008),
     ],
 ];

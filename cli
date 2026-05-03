@@ -38,8 +38,11 @@ $cache = match ($config->get('cache.driver', 'file')) {
 };
 
 // create PCare instance
+$client_configs = $config->get('client.clients');
+$clients        = array_map(fn(array $opt) => new Client($opt), $client_configs);
+
 $pcare = new PCare(
-    clients: new Client($config->get('client.clients')),
+    clients: $clients,
     failureThreshold: $config->get('client.threshold', 3),
     cooldownSeconds: $config->get('client.cooldown', 60),
 );
