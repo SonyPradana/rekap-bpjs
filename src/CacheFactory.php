@@ -21,23 +21,34 @@ final class CacheFactory
         $defaultTTL = $config->get('cache.ttl', 7_884_008);
 
         if ('file' === $driver) {
-            return new FileStorage(
-                path: $baseDir . '/cache',
-                defaultTTL: $defaultTTL
-            );
+            return self::createFileDriver($defaultTTL);
         }
 
         if ('sqlite' === $driver) {
             $path = $baseDir . '/cache/cache.sqlite';
-            $pdo  = new \PDO('sqlite:' . $path);
-            $pdo->exec('CREATE TABLE IF NOT EXISTS cache ("key" TEXT PRIMARY KEY, "value" TEXT, "expiration" INTEGER)');
 
-            return new PdoStorage(
-                pdo: $pdo,
-                defaultTTL: $defaultTTL
-            );
+            return self::createPdoDriver('sqlite:' . $path, $defaultTTL);
         }
 
         throw new \InvalidArgumentException('Unsupported cache driver: ' . $driver);
+    }
+
+    private static function createFileDriver(int $defaultTTL): CacheInterface
+    {
+        return new FileStorage(
+            path: $baseDir . '/cache',
+            defaultTTL: $defaultTTL
+        );
+    }
+
+    private static function createPdoDriver(string $dsn, int $defaultTTL): CacheInterface
+    {
+        $pdo  = new \PDO($dsn);
+        $pdo->exec('CREATE TABLE IF NOT EXISTS cache ("key" TEXT PRIMARY KEY, "value" TEXT, "expiration" INTEGER)');
+
+        return new PdoStorage(
+            pdo: $pdo,
+            defaultTTL: $defaultTTL
+        );
     }
 }
