@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use App\CacheFactory;
 use App\Commands\AnalizeCommand;
 use App\Commands\CacheForgetCommand;
 use App\Commands\CacheGetCommand;
@@ -18,7 +19,6 @@ use App\PCare;
 use Dotenv\Dotenv;
 use GuzzleHttp\Client;
 use System\Cache\CacheInterface;
-use System\Cache\Storage\FileStorage;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -29,14 +29,7 @@ Dotenv::createImmutable(__DIR__)->load();
 $config = new App\Configuration(require __DIR__ . '/config/app.php');
 
 // cache provider
-/** @var CacheInterface */
-$cache = match ($config->get('cache.driver', 'file')) {
-    'file' => new FileStorage(
-        path: __DIR__ . '/cache',
-        defaultTTL: $config->get('cache.ttl', 7_884_008)
-    ),
-    default => throw new InvalidArgumentException('Unsupported cache driver: ' . $config->get('cache.driver')),
-};
+$cache = CacheFactory::create($config, __DIR__);
 
 // create PCare instance
 $client_configs = $config->get('client.clients');
