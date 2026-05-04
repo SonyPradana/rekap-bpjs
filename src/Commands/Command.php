@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Commands;
 
 use App\PCare;
-use System\Cache\Storage\FileStorage;
+use System\Cache\CacheInterface;
 use System\Console\Command as BaseCommand;
 
 use function System\Console\option;
@@ -17,7 +17,7 @@ abstract class Command extends BaseCommand
     public function __construct(
         array $argv,
         protected string $base_dir,
-        protected FileStorage $cache,
+        protected CacheInterface $cache,
         protected PCare $pcare,
     ) {
         parent::__construct($argv);
