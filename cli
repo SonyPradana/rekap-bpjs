@@ -18,7 +18,6 @@ use App\Commands\VisitorDetailsExportCommand;
 use App\PCare;
 use Dotenv\Dotenv;
 use GuzzleHttp\Client;
-use System\Cache\CacheInterface;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
